@@ -7,6 +7,9 @@ public class CatController : MonoBehaviour
 Animator anim;
 private Rigidbody2D rd2d;
 public float speed;
+public float jump;
+
+private bool facingRight = true;
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +58,33 @@ public float speed;
         float verMovement = Input.GetAxis("Vertical");
 
         rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
+
+        if (facingRight == false && hozMovement > 0)
+        {
+            Flip();
+        }
+        else if (facingRight == true && hozMovement < 0)
+        {
+            Flip();
+        }
             
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+
+        if (collision.collider.tag == "Coin")
+        {
+            Destroy(collision.collider.gameObject);
+        }
+
+    }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector2 Scaler = transform.localScale;
+        Scaler.x = Scaler.x * -1;
+        transform.localScale = Scaler;
     }
 }
