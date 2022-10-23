@@ -36,6 +36,7 @@ public class CatController : MonoBehaviour
     {
         rd2d = GetComponent<Rigidbody2D>();
         count = 0;
+
         rd2d = GetComponent<Rigidbody2D>();
         livesValue = 3;
 
@@ -96,6 +97,7 @@ public class CatController : MonoBehaviour
         Move(hozMovement);
 
         rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
+        
         isOnGround = Physics2D.OverlapCircle(goundcheck.position, checkRadius, allGround);
     }
 
@@ -105,6 +107,7 @@ public class CatController : MonoBehaviour
         if (count >= 8)
         {
             WinTextObject.SetActive(true);
+            Destroy(gameObject);
 
             MusicControleScript.PlaySound("Win");
         }
@@ -133,10 +136,12 @@ public class CatController : MonoBehaviour
             count = count +1;
             SetCountText();
         }
-        else if (collision.collider.tag == "Enemy")
+
+        if (collision.collider.tag == "Enemy")
         {
             Destroy(collision.collider.gameObject);
             livesValue = livesValue - 1;
+
             SetCountText();
         }
 
@@ -148,7 +153,7 @@ public class CatController : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.W))
             {
-                rd2d.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+                rd2d.AddForce(new Vector2(0.5f, jump), ForceMode2D.Impulse);
             }
         }
     }
