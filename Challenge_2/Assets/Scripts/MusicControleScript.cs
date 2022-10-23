@@ -4,21 +4,29 @@ using UnityEngine;
 
 public class MusicControleScript : MonoBehaviour
 {
+ public static AudioClip winSound;
+    static AudioSource audioSrc;
 
-    public static MusicControleScript instance;
-
-    private void Awake()
+    // Start is called before the first frame update
+    void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
+        // Draws sound effect from resources folder. (NAME FOLDER "Resources"!!)
+        winSound = Resources.Load<AudioClip>("Win");
 
-        if (instance == null)
+        audioSrc = GetComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+    public static void PlaySound(string clip)
+    {
+        switch (clip)
         {
-            instance = this;
+            case "Win":
+                audioSrc.PlayOneShot(winSound);
+                break;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
-    } 
-   
-}
+    }}

@@ -5,86 +5,122 @@ using TMPro;
 
 public class CatController : MonoBehaviour
 {
-Animator anim;
-private Rigidbody2D rd2d;
+    private Rigidbody2D rd2d;
+    float hozMovement;
+    float verMovement;
+    public float speed;
+    public float jump;
+    public Animator anim;
+    float runSpeedModifier = 2f;
+    bool isRunning = false;
+    private bool facingRight = true;
 
-private int count;
-public float speed;
-public TextMeshProUGUI countText;
-public GameObject WinTextObject;
-public float jump;
+    public TextMeshProUGUI countText;
+    public TextMeshProUGUI livesText;
 
-private bool facingRight = true;
+    private int count;
+    private int livesValue;
+
+    public GameObject WinTextObject;
+    public GameObject LoseTextObject;
+
+    private bool isOnGround;
+    public Transform goundcheck;
+    public float checkRadius;
+    public LayerMask allGround;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
-
         count = 0;
+        rd2d = GetComponent<Rigidbody2D>();
+        livesValue = 3;
+
         SetCountText();
         WinTextObject.SetActive(false);
+       
+        SetCountText();
+        LoseTextObject.SetActive(false);
         
         anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
-    void Update()
+   void Update()
+   {
+    float hozMovement = Input.GetAxis("Horizontal");
+    float verMovement = Input.GetAxis("Vertical");
+
+    if(Input.GetKeyDown(KeyCode.LeftShift))
     {
-        if (Input.GetKeyDown(KeyCode.D))
+        isRunning = true;
+    }
+    if(Input.GetKeyUp(KeyCode.LeftShift))
+    {
+        isRunning = false;
+    }
+   }
+
+   void Move(float dir)
+   {
+    float xVal = dir * speed * 100 * Time.deltaTime;
+    if (isRunning)
+    {
+        xVal *=runSpeedModifier;
+    }
+    Vector2 targetVelocity = new Vector2(xVal,rd2d.velocity.y);
+    rd2d.velocity = targetVelocity;
+   
+    if (facingRight && dir < 0)
         {
-            anim.SetInteger("State", 1);
+            Flip();
+            facingRight = false;
         }
-        if (Input.GetKeyUp(KeyCode.D))
+        else if (!facingRight && dir > 0)
         {
-            anim.SetInteger("State", 0);
+            Flip();
+            facingRight = true;
         }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            anim.SetInteger("State", 1);
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            anim.SetInteger("State", 0);
-        }
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            anim.SetInteger("State", 3);
-        }
-        if (Input.GetKeyUp(KeyCode.W))
-        {
-            anim.SetInteger("State", 4);
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            anim.SetInteger("State", 2);
-        }
-        if (Input.GetKeyUp(KeyCode.R))
-        {
-            anim.SetInteger("State", 0);
-        }
+        anim.SetFloat("xVelocity", Mathf.Abs(rd2d.velocity.x));
+   }
+
+
+    void FixedUpdate()
+    {
         float hozMovement = Input.GetAxis("Horizontal");
         float verMovement = Input.GetAxis("Vertical");
 
-        rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
+        Move(hozMovement);
 
-        if (facingRight == false && hozMovement > 0)
-        {
-            Flip();
-        }
-        else if (facingRight == true && hozMovement < 0)
-        {
-            Flip();
-        }
-            
+        rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
+        isOnGround = Physics2D.OverlapCircle(goundcheck.position, checkRadius, allGround);
     }
 
     void SetCountText()
     {
         countText.text = "Count: " + count.ToString();
-        if (count >= 4)
+        if (count >= 8)
         {
             WinTextObject.SetActive(true);
+
+            MusicControleScript.PlaySound("Win");
+        }
+
+        countText.text = "Count: " + count.ToString();
+        if (count == 4)
+        {
+            livesValue = 3;
+            transform.position = new Vector2(100f, 0.5f);
+        }
+
+        livesText.text = "Lives: " + livesValue.ToString();
+        if (livesValue == 0)
+        {
+            LoseTextObject.SetActive(true);
+            Destroy(gameObject);
         }
     }
 
@@ -97,9 +133,25 @@ private bool facingRight = true;
             count = count +1;
             SetCountText();
         }
+        else if (collision.collider.tag == "Enemy")
+        {
+            Destroy(collision.collider.gameObject);
+            livesValue = livesValue - 1;
+            SetCountText();
+        }
 
     }
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.collider.tag == "Ground" && isOnGround)
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                rd2d.AddForce(new Vector2(0, jump), ForceMode2D.Impulse);
+            }
+        }
+    }
     void Flip()
     {
         facingRight = !facingRight;
@@ -107,4 +159,5 @@ private bool facingRight = true;
         Scaler.x = Scaler.x * -1;
         transform.localScale = Scaler;
     }
+
 }
