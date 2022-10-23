@@ -7,9 +7,10 @@ public class CatController : MonoBehaviour
 {
     private Rigidbody2D rd2d;
     float hozMovement;
-    float verMovement;
-    public float speed;
-    public float jump;
+
+    [SerializeField] public float speed = 3;
+    public float jumppower = 500;
+    bool jump = true;
     public Animator anim;
     float runSpeedModifier = 2f;
     bool isRunning = false;
@@ -24,9 +25,9 @@ public class CatController : MonoBehaviour
     public GameObject WinTextObject;
     public GameObject LoseTextObject;
 
-    private bool isOnGround;
-    public Transform goundcheck;
-    public float checkRadius;
+    private bool isOnGround = false;
+    [SerializeField] public Transform groundCheckCollider;
+    public float checkRadius = .2f;
     public LayerMask allGround;
 
 
@@ -53,7 +54,6 @@ public class CatController : MonoBehaviour
    void Update()
    {
     float hozMovement = Input.GetAxis("Horizontal");
-    float verMovement = Input.GetAxis("Vertical");
 
     if(Input.GetKeyDown(KeyCode.LeftShift))
     {
@@ -63,11 +63,27 @@ public class CatController : MonoBehaviour
     {
         isRunning = false;
     }
+
+    if(Input.GetKeyDown(KeyCode.Space))
+    {
+        jump = true;
+    }
+    else if (Input.GetKeyUp(KeyCode.Space))
+    {
+        jump = false;
+    }
    }
 
-   void Move(float dir)
+   void Move(float dir, bool jumpFlag)
    {
-    float xVal = dir * speed * 100 * Time.deltaTime;
+    if (isOnGround && jumpFlag)
+    {
+        isOnGround = false;
+        jumpFlag = false;
+
+        rd2d.AddForce(new Vector2(0f, jumppower));
+    }
+    float xVal = dir * speed * 100 * Time.fixedDeltaTime;
     if (isRunning)
     {
         xVal *=runSpeedModifier;
@@ -87,18 +103,24 @@ public class CatController : MonoBehaviour
         }
         anim.SetFloat("xVelocity", Mathf.Abs(rd2d.velocity.x));
    }
+   void GroundCheck()
+   {
+    isOnGround = false;
+
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckCollider.position, checkRadius, allGround);
+    if(colliders.Length > 0)
+         isOnGround = true;
+   }
 
 
     void FixedUpdate()
     {
         float hozMovement = Input.GetAxis("Horizontal");
-        float verMovement = Input.GetAxis("Vertical");
 
-        Move(hozMovement);
+        Move(hozMovement, jump);
 
         rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
         
-        isOnGround = Physics2D.OverlapCircle(goundcheck.position, checkRadius, allGround);
     }
 
     void SetCountText()
@@ -147,16 +169,6 @@ public class CatController : MonoBehaviour
 
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Ground" && isOnGround)
-        {
-            if (Input.GetKey(KeyCode.W))
-            {
-                rd2d.AddForce(new Vector2(0.5f, jump), ForceMode2D.Impulse);
-            }
-        }
-    }
     void Flip()
     {
         facingRight = !facingRight;
