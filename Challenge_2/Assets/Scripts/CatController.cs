@@ -5,11 +5,11 @@ using TMPro;
 
 public class CatController : MonoBehaviour
 {
-    private Rigidbody2D rd2d;
+    Rigidbody2D rd2d;
     float hozMovement;
     float verMovement;
 
-    public float speed = 3;
+    [SerializeField] public float speed = 3;
     public float jump;
     bool isjumping;
     public Animator anim;
@@ -27,7 +27,7 @@ public class CatController : MonoBehaviour
     public GameObject LoseTextObject;
 
     private bool isOnGround = false;
-    public Transform groundCheckCollider;
+    [SerializeField] public Transform groundCheckCollider;
     public float checkRadius = .2f;
     public LayerMask allGround;
 
@@ -83,7 +83,7 @@ public class CatController : MonoBehaviour
         isOnGround = false;
         jumpFlag = false;
 
-        rd2d.AddForce(new Vector2(50f, jump));
+        rd2d.AddForce(new Vector2(0f, jump));
     }
     float xVal = dir * speed * 100 * Time.fixedDeltaTime;
     if (isRunning)
@@ -107,10 +107,11 @@ public class CatController : MonoBehaviour
    }
    void GroundCheck()
    {
-         isOnGround = false;
+     isOnGround = false;
 
-         isOnGround = Physics2D.OverlapCircle(groundCheckCollider.position, checkRadius, allGround);
-         isOnGround = true;
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckCollider.position, checkRadius, allGround);
+              if(colliders.Length > 0)
+                   isOnGround = true;
    }
 
 
