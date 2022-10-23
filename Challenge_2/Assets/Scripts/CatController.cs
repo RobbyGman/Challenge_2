@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CatController : MonoBehaviour
 {
 Animator anim;
 private Rigidbody2D rd2d;
+
+private int count;
 public float speed;
+public TextMeshProUGUI countText;
+public GameObject WinTextObject;
 public float jump;
 
 private bool facingRight = true;
@@ -15,6 +20,10 @@ private bool facingRight = true;
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
+
+        count = 0;
+        SetCountText();
+        WinTextObject.SetActive(false);
         
         anim = GetComponent<Animator>();
     }
@@ -70,12 +79,23 @@ private bool facingRight = true;
             
     }
 
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if (count >= 4)
+        {
+            WinTextObject.SetActive(true);
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
 
         if (collision.collider.tag == "Coin")
         {
             Destroy(collision.collider.gameObject);
+            count = count +1;
+            SetCountText();
         }
 
     }
