@@ -9,9 +9,9 @@ public class CatController : MonoBehaviour
     float hozMovement;
     float verMovement;
 
-    [SerializeField] public float speed = 3;
-    public float jumppower = 20f;
-    bool jump = true;
+    public float speed = 3;
+    public float jump;
+    bool isjumping;
     public Animator anim;
     float runSpeedModifier = 2f;
     bool isRunning = false;
@@ -27,7 +27,7 @@ public class CatController : MonoBehaviour
     public GameObject LoseTextObject;
 
     private bool isOnGround = false;
-    [SerializeField] public Transform groundCheckCollider;
+    public Transform groundCheckCollider;
     public float checkRadius = .2f;
     public LayerMask allGround;
 
@@ -68,11 +68,11 @@ public class CatController : MonoBehaviour
 
     if(Input.GetKeyDown(KeyCode.Space))
     {
-        jump = true;
+        isjumping = true;
     }
     else if (Input.GetKeyUp(KeyCode.Space))
     {
-        jump = false;
+        isjumping = false;
     }
    }
 
@@ -83,7 +83,7 @@ public class CatController : MonoBehaviour
         isOnGround = false;
         jumpFlag = false;
 
-        rd2d.AddForce(new Vector2(0f, jumppower));
+        rd2d.AddForce(new Vector2(50f, jump));
     }
     float xVal = dir * speed * 100 * Time.fixedDeltaTime;
     if (isRunning)
@@ -107,10 +107,9 @@ public class CatController : MonoBehaviour
    }
    void GroundCheck()
    {
-    isOnGround = false;
+         isOnGround = false;
 
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckCollider.position, checkRadius, allGround);
-    if(colliders.Length > 0)
+         isOnGround = Physics2D.OverlapCircle(groundCheckCollider.position, checkRadius, allGround);
          isOnGround = true;
    }
 
@@ -120,7 +119,7 @@ public class CatController : MonoBehaviour
         float hozMovement = Input.GetAxis("Horizontal");
         float verMovement = Input.GetAxis("Vertical");
 
-        Move(hozMovement, jump);
+        Move(hozMovement, isjumping);
 
         rd2d.AddForce(new Vector2(hozMovement * speed, verMovement * speed));
         
