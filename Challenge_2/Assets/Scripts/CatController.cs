@@ -7,9 +7,10 @@ public class CatController : MonoBehaviour
 {
     private Rigidbody2D rd2d;
     float hozMovement;
+    float verMovement;
 
     [SerializeField] public float speed = 3;
-    public float jumppower = 500;
+    public float jumppower = 20f;
     bool jump = true;
     public Animator anim;
     float runSpeedModifier = 2f;
@@ -54,6 +55,7 @@ public class CatController : MonoBehaviour
    void Update()
    {
     float hozMovement = Input.GetAxis("Horizontal");
+    float verMovement = Input.GetAxis("Vertical");
 
     if(Input.GetKeyDown(KeyCode.LeftShift))
     {
@@ -116,6 +118,7 @@ public class CatController : MonoBehaviour
     void FixedUpdate()
     {
         float hozMovement = Input.GetAxis("Horizontal");
+        float verMovement = Input.GetAxis("Vertical");
 
         Move(hozMovement, jump);
 

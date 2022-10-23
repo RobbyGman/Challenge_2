@@ -7,7 +7,7 @@ public class CameraControl : MonoBehaviour
 
     public Transform target;
 
-    public float yOffset = 1f;
+    public float yOffset = 0f;
     public float FollowSpeed = 2f;
 
     // Start is called before the first frame update
