@@ -9,7 +9,7 @@ public class CatController : MonoBehaviour
     float hozMovement;
     float verMovement;
 
-    [SerializeField] public float speed = 3;
+    public float speed = 3;
     public float jump;
     bool isjumping;
     public Animator anim;
@@ -27,7 +27,7 @@ public class CatController : MonoBehaviour
     public GameObject LoseTextObject;
 
     private bool isOnGround = false;
-    [SerializeField] public Transform groundCheckCollider;
+    public Transform groundCheckCollider;
     public float checkRadius = .2f;
     public LayerMask allGround;
 
